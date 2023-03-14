@@ -1,6 +1,6 @@
 set $mod Mod4
 
-bindsym $mod+shift+x exec i3lock
+#bindsym $mod+shift+x exec i3lock
 
 font pango:FiraCode 11
 
@@ -17,11 +17,8 @@ bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOU
 
 # use light to adjust brightness 
 
-bindsym $mod+<F9> exec  light -A 5
-bindsym $mod+<F10> exec  light -U 5
-bindsym shift+XF86MonBrightnessUp exec  light -A 25
-bindsym shift+XF86MonBrightnessDown exec  light -U 25
-
+bindsym XF86MonBrightnessUp exec  light -A 5
+bindsym XF86MonBrightnessDown exec  light -U 5
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 # start a terminal
@@ -30,12 +27,9 @@ bindsym $mod+Return exec i3-sensible-terminal
 # kill focused window
 bindsym $mod+q kill
 
-# start dmenu (a program launcher)
- bindsym $mod+d exec dmenu_run
-# There also is the (new) i3-dmenu-desktop which only displays applications
-# shipping a .desktop file. It is a wrapper around dmenu, so you need that
-# installed.
-# bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
+# drun list all the running applications 
+bindsym $mod+d exec "rofi -show drun -show-icons" 
+
 
 # change focus
 bindsym $mod+h focus left
@@ -167,7 +161,7 @@ bindsym $mod+r mode "resize"
 
  mode "$mode_system" {
      #bindsym l exec --no-startup-id $i3lockwall, mode "default"
-     bindsym l exec i3lock, mode "default"
+     bindsym l exec /home/$USER/.i3/lock
      bindsym e exec --no-startup-id i3-msg exit, mode "default"
      bindsym h exec --no-startup-id $i3lockwall && systemctl hibernate, mode "default"
      bindsym r exec --no-startup-id systemctl reboot, mode "default"
@@ -181,15 +175,50 @@ bindsym $mod+r mode "resize"
      bindsym $mod+Escape exec --no-startup-id systemctl poweroff -i, mode "default"
     
 
+bindsym $mod+BackSpace mode "$mode_system"
 gaps inner 10
 gaps outer 10
 default_border pixel 3
 smart_borders on
+# get color from XResource config - variable_name XResource fallback
 
- bindsym $mod+BackSpace mode "$mode_system"
+# special
+set_from_resource $foreground foreground #C6C6C6
+set_from_resource $background background #1C1C1C
+set_from_resource $color8 cursorColor #C6C6C6
 
-#setting i3lock to lock the screen 
-#set $i3lockwall i3lock -i /home/fitsum/Pictures/test.png   
+# black
+set_from_resource $black1 color0 #303030
+set_from_resource $black2 color8 #444444
+set $trueblack #000000
+
+# red
+set_from_resource $red1 color1 #d75f5f
+set_from_resource $red2 color9 #d75f5f
+
+# green
+set_from_resource $green1 color2 #87AF87
+set_from_resource $green2 color10 #87AF87
+
+# yellow
+set_from_resource $yellow1 color3 #ffd75f
+set_from_resource $yellow2 color11 #ffd75f
+
+# blue
+set_from_resource $blue1 color4 #87afd7
+set_from_resource $blue2 color12 #87afd7
+
+# magenta
+set_from_resource $cyan1 color5 #afafd7
+set_from_resource $cyan2 color13 #afafd7
+
+# cyan
+set_from_resource $cyan1 color6 #afd7ff
+set_from_resource $cyan2 color14 #afd7ff
+
+# white
+set_from_resource $white1 color7 #4E4E4E
+set_from_resource $white2 color15 #ffffff
 
 
 # Start i3bar to display a workspace bar (plus the system information i3status
@@ -197,10 +226,21 @@ bar {
     position top
     status_command i3status 
   #  i3bar_command i3bar --transparency
+   colors {
+        background $black2
+        statusline $white2
+        separator $white2
+    # border background text
+        focused_workspace  $background $background $cyan1
+        active_workspace   $black2 $black1 $white2
+        inactive_workspace $black1 $black2 $foreground
+        urgent_workspace   $red1 $red1 $white2
+        binding_mode       $background $red2 $white1
+        }
 }
 #to go back and forth using the same key strokes
 #workspace_auto_back_and_forth yes
-
-
+bindsym $mod+shift+x exec /home/$USER/.i3/lock
 exec_always feh --bg-scale /home/fitsum/Pictures/wall.jpg
 exec_always i3-layouts
+exec_always picom --experimental-backends -b
